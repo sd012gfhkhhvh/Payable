@@ -19,7 +19,7 @@ const userSignup = async (req, res, next) => {
 
     try {
         // Input validation via zod
-        const validatedInput = userSchema.safeParse(user)
+        const { success } = userSchema.safeParse(user)
 
         // db validation for same username
         const existingUser = await User.findOne({ username: user.username })
@@ -30,7 +30,7 @@ const userSignup = async (req, res, next) => {
             })
         }
 
-        if (!validatedInput.success) {
+        if (!success) {
             res.status(411).json({
                 message: "Incorrect inputs"
             })
@@ -38,9 +38,9 @@ const userSignup = async (req, res, next) => {
 
         // create new user
         const newUser = await User.create(user)
-
+        const userId = newUser._id;
         //sign a new jwt token
-        const token = jwt.sign({ userId: newUser._id }, JWT_SECRET)
+        const token = jwt.sign({ userId }, JWT_SECRET)
 
         res.status(200).json({
             message: "User created successfully",
