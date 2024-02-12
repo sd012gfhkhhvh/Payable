@@ -12,4 +12,7 @@ router.post("/signin", userController.userSignin)
 //update credentials
 router.put("/update", userAuthMiddleware, userController.updateInfo)
 
+//filter users via firstName/lastName
+router.get("/bulk", userAuthMiddleware, userController.filterUser)
+
 module.exports = router

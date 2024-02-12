@@ -109,7 +109,30 @@ const updateInfo = async (req, res, next) => {
         // find and update on db
         const updatedUser = await User.findByIdAndUpdate(userId, req.body)
 
-        res.status(200).json({message: "Updated successfully"})
+        res.status(200).json({ message: "Updated successfully" })
+
+    } catch (err) {
+        console.log(err.message);
+        res.status(404).json({ message: "Error while updating information" })
+    }
+}
+
+// filter via firstName/lastName
+const filterUser = async (req, res, next) => {
+    const filterObj = req.query.filter; // ?filter=soham
+
+    try {
+        // find and update on db
+        const users = await User.find(
+            { "$or": [{ firstName: filterObj }, { lastName: filterObj }] }, //
+            { firstName: 1, lastName: 1 } // return users with the field mentioned(id is by default included)
+        )
+
+        res.status(200).json(
+            {
+                users: users
+            }
+        )
 
     } catch (err) {
         console.log(err.message);
@@ -121,4 +144,5 @@ module.exports = {
     userSignup,
     userSignin,
     updateInfo,
+    filterUser,
 }
