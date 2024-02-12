@@ -10,6 +10,6 @@ router.post("/signup", userController.userSignup)
 router.post("/signin", userController.userSignin)
 
 //update credentials
-router.put("/update", userAuthMiddleware, userController.userSignin)
+router.put("/update", userAuthMiddleware, userController.updateInfo)
 
 module.exports = router
