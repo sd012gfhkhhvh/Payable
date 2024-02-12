@@ -98,7 +98,8 @@ const updateInfo = async (req, res, next) => {
 
     try {
         // Input validation via zod
-        const result = userUpdateSchema.safeParse(req.body)
+        const { success } = userUpdateSchema.safeParse(req.body)
+
         if (!success) {
             res.status(411).json({
                 message: "Incorrect inputs"
@@ -108,7 +109,7 @@ const updateInfo = async (req, res, next) => {
         // find and update on db
         const updatedUser = await User.findByIdAndUpdate(userId, req.body)
 
-        res.status(200).json({ message: "Updated successfully" })
+        res.status(200).json({message: "Updated successfully"})
 
     } catch (err) {
         console.log(err.message);
