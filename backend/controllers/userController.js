@@ -1,4 +1,3 @@
-const zod = require('zod')
 const jwt = require('jsonwebtoken')
 const userSchema = require('../schemas/user')
 const User = require("../models/userModel")
@@ -23,7 +22,7 @@ const userSignup = async (req, res, next) => {
         const validatedInput = userSchema.safeParse(user)
 
         // db validation for same username
-        const existingUser = await User.findOne({ username })
+        const existingUser = await User.findOne({ username: user.username })
 
         if (existingUser) {
             res.status(411).json({
