@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const { userSignupSchema, userSigninSchema } = require('../schemas/user')
+const { userSignupSchema, userSigninSchema, userUpdateSchema } = require('../schemas/user')
 const User = require("../models/userModel")
 
 const dotenv = require('dotenv');
@@ -20,7 +20,7 @@ const userSignup = async (req, res, next) => {
 
     try {
         // Input validation via zod
-        const { success } = userSignupSchema.safeParse(user)
+        const { success } = userSignupSchema.safeParse(req.body)
 
         // db validation for same username
         const existingUser = await User.findOne({ username: user.username })
@@ -60,7 +60,7 @@ const userSignin = async (req, res, next) => {
 
     try {
         // Input validation via zod
-        const { success } = userSigninSchema.safeParse({ username, password })
+        const { success } = userSigninSchema.safeParse(req.body)
 
         if (!success) {
             res.status(411).json({
@@ -91,8 +91,29 @@ const userSignin = async (req, res, next) => {
 }
 
 // update the user credentials
-const updateInfo = (req, res, next) => {
+const updateInfo = async (req, res, next) => {
 
+    //get the userId from the userAuthmiddleware
+    const userId = req.userId;
+
+    try {
+        // Input validation via zod
+        const result = userUpdateSchema.safeParse(req.body)
+        if (!success) {
+            res.status(411).json({
+                message: "Incorrect inputs"
+            })
+        }
+
+        // find and update on db
+        const updatedUser = await User.findByIdAndUpdate(userId, req.body)
+
+        res.status(200).json({ message: "Updated successfully" })
+
+    } catch (err) {
+        console.log(err.message);
+        res.status(404).json({ message: "Error while updating information" })
+    }
 }
 
 module.exports = {
