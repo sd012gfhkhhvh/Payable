@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const userSchema = require('../schemas/user')
+const { userSignupSchema, userSigninSchema } = require('../schemas/user')
 const User = require("../models/userModel")
 
 const dotenv = require('dotenv');
@@ -9,6 +9,7 @@ dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// signing a new user
 const userSignup = async (req, res, next) => {
     const user = {
         username: req.body.username,
@@ -19,7 +20,7 @@ const userSignup = async (req, res, next) => {
 
     try {
         // Input validation via zod
-        const { success } = userSchema.safeParse(user)
+        const { success } = userSignupSchema.safeParse(user)
 
         // db validation for same username
         const existingUser = await User.findOne({ username: user.username })
@@ -52,10 +53,44 @@ const userSignup = async (req, res, next) => {
     }
 }
 
-const userSignin = (req, res, next) => {
+//login a user
+const userSignin = async (req, res, next) => {
+    const username = req.body.username
+    const password = req.body.password
 
+    try {
+        // Input validation via zod
+        const { success } = userSigninSchema.safeParse({ username, password })
+
+        if (!success) {
+            res.status(411).json({
+                message: "Incorrect inputs"
+            })
+        }
+
+        //find the user
+        const user = await User.findOne({ username, password })
+
+        if (user === null) {
+            res.status(411).json({
+                message: "user does not exist"
+            })
+        }
+
+        const userId = user._id;
+        const token = jwt.sign({ userId }, JWT_SECRET)
+
+        res.status(200).json({
+            token: token
+        })
+
+    } catch (err) {
+        console.log(err.message);
+        res.status(404).json({ message: "Error while logging in" })
+    }
 }
 
+// update the user credentials
 const updateInfo = (req, res, next) => {
 
 }
