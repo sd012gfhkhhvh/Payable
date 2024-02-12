@@ -16,7 +16,7 @@ const userAuthMiddleware = (req, res, next) => {
 
     try {
         const decodedValue = jwt.verify(actualToken, JWT_SECRET)
-        req.username = decodedValue.username; // send the decoded username along
+        req.userId = decodedValue.userId; // send the decoded userId along
         next();
     }catch(err) {
         console.log(err.message);
