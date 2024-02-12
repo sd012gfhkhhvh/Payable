@@ -5,15 +5,13 @@ const cors = require("cors");
 const userRouter = require("./routes/user")
 
 const app = express();
-
 dotenv.config()
-
 PORT = process.env.PORT || 5050;
 
 app.use(cors());
-
 app.use(express.json());
 
+//routes
 app.use("/user", userRouter)
 
 app.listen(PORT, () => {

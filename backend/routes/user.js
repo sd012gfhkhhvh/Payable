@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const router = Router();
 const userController = require("../controllers/userController")
+const userAuthMiddleware = require("../middlewares/userAuthMiddleware")
 
 //user signup route
 router.post("/signup", userController.userSignup)
@@ -9,6 +10,6 @@ router.post("/signup", userController.userSignup)
 router.post("/signin", userController.userSignin)
 
 //update credentials
-router.put("/signin", userController.userSignin)
+router.put("/update", userAuthMiddleware, userController.userSignin)
 
 module.exports = router
