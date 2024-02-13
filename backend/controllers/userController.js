@@ -122,14 +122,24 @@ const filterUser = async (req, res, next) => {
     const filterObj = req.query.filter || ""; // ?filter=soham
 
     try {
-        // find and update on db
         const users = await User.find(
-            { "$or": [{ firstName: filterObj }, { lastName: filterObj }] }, //
+            {
+                $or: [{
+                    firstName: {
+                        "$regex": filterObj
+                    }
+                }, {
+                    lastName: {
+                        "$regex": filterObj
+                    }
+                }]
+            },
+            // select objects
             { firstName: 1, lastName: 1 } // return users with the field mentioned(id is by default included)
         ).toArray();
-        
-        //TODO: what does find returns if there is no user found
-        if(users.length){
+
+        //TODO: what does find returns if there is no user found. Ans: [] (empty array) for 'find' and null for 'findOne'
+        if (users.length) {
             res.status(404).json({ message: "user not found" })
             return;
         }
