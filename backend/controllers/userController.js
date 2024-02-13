@@ -119,7 +119,7 @@ const updateInfo = async (req, res, next) => {
 
 // filter via firstName/lastName
 const filterUser = async (req, res, next) => {
-    const filterObj = req.query.filter; // ?filter=soham
+    const filterObj = req.query.filter || ""; // ?filter=soham
 
     try {
         // find and update on db
