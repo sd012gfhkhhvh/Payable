@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const { userSignupSchema, userSigninSchema, userUpdateSchema } = require('../schemas/user')
 const User = require("../models/user")
+const Account = require('../models/account');
 
 const dotenv = require('dotenv');
 const path = require('path');
@@ -40,6 +41,13 @@ const userSignup = async (req, res, next) => {
         // create new user
         const newUser = await User.create(user)
         const userId = newUser._id;
+
+        // create new account
+        await Account.create({
+            userId,
+            balance: 1 + Math.random() * 10000
+        })
+
         //sign a new jwt token
         const token = jwt.sign({ userId }, JWT_SECRET)
 
