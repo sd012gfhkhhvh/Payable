@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 const { userSignupSchema, userSigninSchema, userUpdateSchema } = require('../schemas/user')
-const User = require("../models/userModel")
+const User = require("../models/user")
 
 const dotenv = require('dotenv');
 const path = require('path');
