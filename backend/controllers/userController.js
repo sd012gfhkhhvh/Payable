@@ -115,7 +115,7 @@ const updateInfo = async (req, res, next) => {
         }
 
         // find and update on db
-        const updatedUser = await User.findByIdAndUpdate(userId, req.body)
+        const updatedUser = await User.findByIdAndUpdate(userId, {"$set": req.body})
 
         res.status(200).json({ message: "Updated successfully" })
 
