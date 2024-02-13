@@ -126,7 +126,13 @@ const filterUser = async (req, res, next) => {
         const users = await User.find(
             { "$or": [{ firstName: filterObj }, { lastName: filterObj }] }, //
             { firstName: 1, lastName: 1 } // return users with the field mentioned(id is by default included)
-        )
+        ).toArray();
+        
+        //TODO: what does find returns if there is no user found
+        if(users.length){
+            res.status(404).json({ message: "user not found" })
+            return;
+        }
 
         res.status(200).json(
             {
