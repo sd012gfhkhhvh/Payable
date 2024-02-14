@@ -49,33 +49,36 @@ const transferMoney = async (req, res, next) => {
             }
         })
 
-        await Account.updateOne({
-            userId: to
-        }, {
-            $inc: {
-                balance: amount
-            }
-        }, (err, docs => {
-            if (err) {
-                // money roll back logic
-                Account.updateOne({
-                    userId: userId
-                }, {
-                    $inc: {
-                        balance: amount
-                    }
-                }).then(() => {
-                    console.log("Money rolled back successfully")
-                    return res.status(404).json({ message: "Error in creditting money to the recipants account." })
-                })
+        await Account.updateOne(
+            {
+                userId: to
+            },
+            {
+                $inc: {
+                    balance: amount
+                }
+            },
+            (err, docs) => {
+                if (err) {
+                    // money roll back logic
+                    Account.updateOne({
+                        userId: userId
+                    }, {
+                        $inc: {
+                            balance: amount
+                        }
+                    }).then(() => {
+                        console.log("Money rolled back successfully")
+                        return res.status(404).json({ message: "Error in creditting money to the recipants account." })
+                    })
 
-            } else {
-                console.log("Updated Docs : ", docs);
-                return res.status(200).json({
-                    message: "Transfer successful"
-                })
-            }
-        }))
+                } else {
+                    console.log("Updated Docs : ", docs);
+                    return res.status(200).json({
+                        message: "Transfer successful"
+                    })
+                }
+            })
 
     } catch (err) {
         console.log(err.message);
