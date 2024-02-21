@@ -118,6 +118,9 @@ const transferMoney = async (req, res, next) => {
         await session.abortTransaction();
         console.log(err.message);
         res.status(404).json({ message: "error transfering money" });
+    } finally {
+        // End the session
+        session.endSession();
     }
 }
 
