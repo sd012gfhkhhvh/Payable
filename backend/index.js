@@ -1,11 +1,15 @@
 const express = require("express");
+//configuring environment variables
 const dotenv = require("dotenv");
+dotenv.config()
+
+// 3rd party modules import
 const cors = require("cors");
 
+//routes import
 const rootRouter = require("./routes")
 
 const app = express();
-dotenv.config()
 PORT = process.env.PORT || 5050;
 
 app.use(cors());

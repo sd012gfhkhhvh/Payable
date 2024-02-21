@@ -1,9 +1,5 @@
 const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
-const path = require('path');
-
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
-
+// jwt key
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const userAuthMiddleware = (req, res, next) => {

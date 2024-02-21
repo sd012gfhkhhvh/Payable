@@ -2,12 +2,7 @@ const jwt = require('jsonwebtoken')
 const { userSignupSchema, userSigninSchema, userUpdateSchema } = require('../schemas/user')
 const User = require("../models/user")
 const Account = require('../models/account');
-
-const dotenv = require('dotenv');
-const path = require('path');
-
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
-
+// jwt key
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // signing a new user

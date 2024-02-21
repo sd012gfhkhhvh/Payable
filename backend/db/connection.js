@@ -1,8 +1,8 @@
 const mongoose = require('mongoose')
-const path = require('path');
-const dotenv = require('dotenv')
-// Adjust the path to point to the root directory
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
+// const path = require('path');
+// const dotenv = require('dotenv')
+// // Adjust the path to point to the root directory
+// dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const DB_URI = process.env.DB_URI
 
