@@ -77,7 +77,7 @@ const transferMoney = async (req, res, next) => {
 
         await Account.updateOne(
             {
-                userId: to
+                userId: toUserId
             },
             {
                 $inc: {
