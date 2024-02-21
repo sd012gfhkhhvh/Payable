@@ -21,17 +21,18 @@ const getbalance = async (req, res, next) => {
 const transferMoney = async (req, res, next) => {
 
     const fromUserId = req.userId; //getting userId from userAuth middleware
-    const toAccountId = req.body.to
+    const toUserId = req.body.to
     const amount = req.body.amount
 
     // Input validation
     const { success } = transactionSchema.safeParse({
-        to: toAccountId,
+        from: fromUserId,
+        to: toUserId,
         amount: amount
     })
 
     if (!success) {
-        res.status(411).json({
+        return res.status(411).json({
             message: "Incorrect inputs"
         })
     }
@@ -56,7 +57,7 @@ const transferMoney = async (req, res, next) => {
         }
 
         const toAccount = await Account.findOne({
-            userId: toAccountId
+            userId: toUserId
         }).session(session)
 
         if (!toAccount) {
