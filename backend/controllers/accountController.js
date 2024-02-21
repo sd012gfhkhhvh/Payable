@@ -1,5 +1,8 @@
 const { default: mongoose } = require("mongoose");
+// models export
 const Account = require("../models/account");
+//schema export
+const { transactionSchema } = require("../schemas/account")
 
 const getbalance = async (req, res, next) => {
     const userId = req.userId; //getting userId from userAuth middleware
@@ -20,6 +23,18 @@ const transferMoney = async (req, res, next) => {
     const fromUserId = req.userId; //getting userId from userAuth middleware
     const toAccountId = req.body.to
     const amount = req.body.amount
+
+    // Input validation
+    const { success } = transactionSchema.safeParse({
+        to: toAccountId,
+        amount: amount
+    })
+
+    if (!success) {
+        res.status(411).json({
+            message: "Incorrect inputs"
+        })
+    }
 
     //start a session to initiate the transaction
     const session = await mongoose.startSession();
