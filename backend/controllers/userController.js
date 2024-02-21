@@ -104,7 +104,7 @@ const updateInfo = async (req, res, next) => {
         const { success } = userUpdateSchema.safeParse(req.body)
 
         if (!success) {
-            res.status(411).json({
+            return res.status(411).json({
                 message: "Incorrect inputs"
             })
         }
@@ -129,7 +129,7 @@ const filterUser = async (req, res, next) => {
             {
                 $or: [{
                     firstName: {
-                        "$regex": filterObj
+                        "$regex": filterObj // regex is needed to handle the empty string condition where it returns all users
                     }
                 }, {
                     lastName: {
