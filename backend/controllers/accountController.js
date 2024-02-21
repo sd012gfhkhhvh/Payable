@@ -68,7 +68,7 @@ const transferMoney = async (req, res, next) => {
                     balance: amount
                 }
             },
-            // Roolback logic without using mongodb transaction
+            // Rollback logic without using mongodb transaction
             // (err, docs) => {
             //     if (err) {
             //         // money roll back logic
@@ -92,7 +92,15 @@ const transferMoney = async (req, res, next) => {
             // }
         ).session(session)
 
+        // Commit the transaction
+        await session.commitTransaction();
+        res.json({
+            message: "Transfer successful"
+        });
+
     } catch (err) {
+        // rollback the transaction
+        await session.abortTransaction();
         console.log(err.message);
         res.status(404).json({ message: "error transfering money" });
     }
