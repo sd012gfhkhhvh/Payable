@@ -18,18 +18,18 @@ const userSignup = async (req, res, next) => {
         // Input validation via zod
         const { success } = userSignupSchema.safeParse(req.body)
 
+        if (!success) {
+            return res.status(411).json({
+                message: "Incorrect inputs"
+            })
+        }
+
         // db validation for same username
         const existingUser = await User.findOne({ username: user.username })
 
         if (existingUser) {
-            res.status(411).json({
+            return res.status(411).json({
                 message: "Email already taken"
-            })
-        }
-
-        if (!success) {
-            res.status(411).json({
-                message: "Incorrect inputs"
             })
         }
 
@@ -46,13 +46,13 @@ const userSignup = async (req, res, next) => {
         //sign a new jwt token
         const token = jwt.sign({ userId }, JWT_SECRET)
 
-        res.status(200).json({
+        return res.status(200).json({
             message: "User created successfully",
             token: token
         })
     } catch (err) {
         console.log(err.message);
-        res.status(404).json({ message: "error creating user" })
+        return res.status(404).json({ message: "error creating user" })
     }
 }
 
@@ -66,7 +66,7 @@ const userSignin = async (req, res, next) => {
         const { success } = userSigninSchema.safeParse(req.body)
 
         if (!success) {
-            res.status(411).json({
+            return res.status(411).json({
                 message: "Incorrect inputs"
             })
         }
@@ -75,7 +75,7 @@ const userSignin = async (req, res, next) => {
         const user = await User.findOne({ username, password })
 
         if (user === null) {
-            res.status(411).json({
+            return res.status(411).json({
                 message: "user does not exist"
             })
         }
@@ -110,20 +110,20 @@ const updateInfo = async (req, res, next) => {
         }
 
         // find and update on db
-        const updatedUser = await User.findByIdAndUpdate(userId, {"$set": req.body})
+        const updatedUser = await User.findByIdAndUpdate(userId, { "$set": req.body })
 
-        res.status(200).json({ message: "Updated successfully" })
+        return res.status(200).json({ message: "Updated successfully" })
 
     } catch (err) {
         console.log(err.message);
-        res.status(404).json({ message: "Error while updating information" })
+        return res.status(404).json({ message: "Error while updating information" })
     }
 }
 
 // filter via firstName/lastName
 const filterUser = async (req, res, next) => {
     const filterObj = req.query.filter || ""; // ?filter=soham
-
+    console.log(filterObj);
     try {
         const users = await User.find(
             {
@@ -139,12 +139,11 @@ const filterUser = async (req, res, next) => {
             },
             // select objects
             { firstName: 1, lastName: 1 } // return users with the field mentioned(id is by default included)
-        ).toArray();
+        )
 
         //TODO: what does find returns if there is no user found. Ans: [] (empty array) for 'find' and null for 'findOne'
-        if (users.length) {
-            res.status(404).json({ message: "user not found" })
-            return;
+        if (users.length === 0) {
+            return res.status(404).json({ message: "user not found" })
         }
 
         res.status(200).json(
