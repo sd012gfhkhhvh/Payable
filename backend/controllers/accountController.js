@@ -16,16 +16,16 @@ const getbalance = async (req, res, next) => {
 }
 
 const transferMoney = async (req, res, next) => {
+
+    const fromUserId = req.userId; //getting userId from userAuth middleware
+    const toAccountId = req.body.to
+    const amount = req.body.amount
+
     //start a session to initiate the transaction
     const session = await mongoose.startSession();
 
     //initiation of the transaction
     session.startTransaction();
-
-    const fromUserId = req.userId; //getting userId from userAuth middleware
-
-    const toAccountId = req.body.to
-    const amount = req.body.amount
 
     try {
 
