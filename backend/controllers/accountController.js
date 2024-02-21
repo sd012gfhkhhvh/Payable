@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Account = require("../models/account");
 
 const getbalance = async (req, res, next) => {
@@ -15,15 +16,23 @@ const getbalance = async (req, res, next) => {
 }
 
 const transferMoney = async (req, res, next) => {
-    const userId = req.userId; //getting userId from userAuth middleware
+    //start a session to initiate the transaction
+    const session = await mongoose.startSession();
+
+    //initiation of the transaction
+    session.startTransaction();
+
+    const fromUserId = req.userId; //getting userId from userAuth middleware
 
     const toAccountId = req.body.to
     const amount = req.body.amount
 
     try {
+
+        // Fetch the accounts within the transaction
         const account = await Account.findOne({
-            userId: userId
-        });
+            userId: fromUserId
+        }).session(session)
 
         if (account.balance < amount) {
             return res.status(400).json({
@@ -33,7 +42,7 @@ const transferMoney = async (req, res, next) => {
 
         const toAccount = await Account.findOne({
             userId: toAccountId
-        });
+        }).session(session)
 
         if (!toAccount) {
             return res.status(400).json({
@@ -41,6 +50,7 @@ const transferMoney = async (req, res, next) => {
             })
         }
 
+        // Perform the transfer
         await Account.updateOne({
             userId: req.userId
         }, {
@@ -58,27 +68,29 @@ const transferMoney = async (req, res, next) => {
                     balance: amount
                 }
             },
-            (err, docs) => {
-                if (err) {
-                    // money roll back logic
-                    Account.updateOne({
-                        userId: userId
-                    }, {
-                        $inc: {
-                            balance: amount
-                        }
-                    }).then(() => {
-                        console.log("Money rolled back successfully")
-                        return res.status(404).json({ message: "Error in creditting money to the recipants account." })
-                    })
+            // Roolback logic without using mongodb transaction
+            // (err, docs) => {
+            //     if (err) {
+            //         // money roll back logic
+            //         Account.updateOne({
+            //             userId: userId
+            //         }, {
+            //             $inc: {
+            //                 balance: amount
+            //             }
+            //         }).then(() => {
+            //             console.log("Money rolled back successfully")
+            //             return res.status(404).json({ message: "Error in creditting money to the recipants account." })
+            //         })
 
-                } else {
-                    console.log("Updated Docs : ", docs);
-                    return res.status(200).json({
-                        message: "Transfer successful"
-                    })
-                }
-            })
+            //     } else {
+            //         console.log("Updated Docs : ", docs);
+            //         return res.status(200).json({
+            //             message: "Transfer successful"
+            //         })
+            //     }
+            // }
+        ).session(session)
 
     } catch (err) {
         console.log(err.message);
