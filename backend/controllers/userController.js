@@ -125,11 +125,12 @@ const filterUser = async (req, res, next) => {
     const filterObj = req.query.filter || ""; // ?filter=soham
   
     try {
+        //TODO: indexing
         const users = await User.find(
             {
                 $or: [{
                     firstName: {
-                        "$regex": filterObj // regex is needed to handle the empty string condition where it returns all users
+                        "$regex": filterObj // regex is needed to handle the sub-string match to the db
                     }
                 }, {
                     lastName: {
