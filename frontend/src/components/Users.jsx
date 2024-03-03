@@ -22,7 +22,7 @@ export const Users = () => {
                         authorization: "Bearer " + localStorage.getItem("token")
                     }
                 })
-
+                console.log(response.data.users);
                 setUsers(response.data.users)
             } catch (e) {
                 // alert(e.response.data.message)

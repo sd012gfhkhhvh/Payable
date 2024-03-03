@@ -15,4 +15,7 @@ router.put("/update", userAuthMiddleware, userController.updateInfo)
 //filter users via firstName/lastName
 router.get("/bulk", userAuthMiddleware, userController.filterUser)
 
+//identify user
+router.get("/me", userAuthMiddleware, userController.isUser)
+
 module.exports = router
