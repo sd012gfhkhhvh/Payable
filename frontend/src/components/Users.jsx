@@ -1,33 +1,41 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import axios from "axios"
+
+// import component
 import { Button } from "./Button"
 
-import { useNavigate } from "react-router-dom";
 
 export const Users = () => {
 
     // Replace with backend call
-    const [users, setUsers] = useState(
-        [
-            {
-                firstName: "Soham",
-                lastName: "Das",
-                _id: 1
-            },
-            {
-                firstName: "Harkirat",
-                lastName: "Singh",
-                _id: 2
+    const [users, setUsers] = useState([]);
+    const [filter, setFilter] = useState("");
+
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const response = await axios.get("http://localhost:3000/api/v1/user/bulk?filter=" + filter, {
+                    headers: {
+                        authorization: "Bearer " + localStorage.getItem("token")
+                    }
+                })
+
+                setUsers(response.data.users)
+            } catch (e) {
+                // alert(e.response.data.message)
             }
-        ]
-    );
+        })()
+    }, [filter])
 
     return <>
         <div className="font-bold mt-6 text-lg">
             Users
         </div>
         <div className="my-2">
-            <input type="text" placeholder="Search users..." className="w-full px-2 py-1 border rounded border-slate-200"></input>
+            <input onChange={(e) => setFilter(e.target.value)} type="text" placeholder="Search users..." className="w-full px-2 py-1 border rounded border-slate-200"></input>
         </div>
         <div>
             {users.map(user => <User key={user._id} user={user} />)}
@@ -53,7 +61,7 @@ function User({ user }) {
         </div>
 
         <div className="flex flex-col justify-center h-ful">
-            <Button onClick={() => navigate("/send")} label={"Send Money"} />
+            <Button onClick={() => navigate("/send?firstName=" + user.firstName + "&userId=" + user._id)} label={"Send Money"} />
         </div>
     </div>
 }
