@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -8,6 +8,7 @@ import { SubHeading } from "../../components/SubHeading"
 import { InputBox } from "../../components/InputBox"
 import { Button } from "../../components/Button"
 import { BottomWarning } from "../../components/BottomWarning"
+import { isMe } from "../../../utils/me";
 
 export const Signin = () => {
 
@@ -15,6 +16,17 @@ export const Signin = () => {
 
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+
+  //checking the users login status
+  useEffect(() => {
+    isMe().then((response) => {
+      if (response) {
+        navigate("/dashboard")
+      }
+    }).catch((error) => {
+      console.log(error.message);
+    })
+  }, [navigate])
 
   // Signin
   const handleSignin = async () => {

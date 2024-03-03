@@ -167,13 +167,13 @@ const isUser = async (req, res, next) => {
     try {
         const user = await User.findById(userId)
         if (!user) {
-            res.status(411).json({ message: "Not an user" })
+            return res.status(411).json({ message: "Not an user" })
         }
 
         res.status(200).json({ user })
     } catch (err) {
         console.log(err.message);
-        res.status(404).json({ message: "Error getting user" })
+        return res.status(404).json({ message: "Error getting user" })
     }
 }
 

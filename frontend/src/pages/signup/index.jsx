@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -8,6 +8,7 @@ import { SubHeading } from "../../components/SubHeading"
 import { InputBox } from "../../components/InputBox"
 import { Button } from "../../components/Button"
 import { BottomWarning } from "../../components/BottomWarning"
+import { isMe } from "../../../utils/me";
 
 export const Signup = () => {
 
@@ -18,7 +19,18 @@ export const Signup = () => {
   const [lastName, setLastname] = useState("")
   const [password, setPassword] = useState("")
 
-  // Signin
+  //checking the users login status
+  useEffect(() => {
+    isMe().then((response) => {
+      if (response) {
+        navigate("/dashboard")
+      }
+    }).catch((error) => {
+      console.log(error.message);
+    })
+  }, [navigate])
+
+  // Signup
   const handleSignup = async () => {
     try {
       const response = await axios.post("http://localhost:3000/api/v1/user/signup", {
