@@ -32,15 +32,14 @@ export const Dashboard = () => {
 
   useEffect(() => {
 
+    // get the current users data and fetch balance
     isMe().then((response) => {
       if (response) {
-        setFirstName(response.data.user.firstName)
+        setFirstName(response.data.user.firstName) // set first name
         fetchbalance()
       }
       else {
         setFirstName("") //reset the first name
-        //navigate to the sign in page
-        navigate("/signin");
       }
     }).catch((error) => {
       console.log(error.message);
