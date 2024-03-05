@@ -1,6 +1,8 @@
+/* eslint-disable react/prop-types */
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { isMe } from "../../../utils/me"
+
 
 export const Home = () => {
     const navigate = useNavigate()
@@ -20,6 +22,8 @@ export const Home = () => {
     }, [navigate])
 
     return (
-        <div>Home</div>
-    )
+        <>
+            Home
+        </>
+    );
 }
