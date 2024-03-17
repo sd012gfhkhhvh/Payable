@@ -133,11 +133,13 @@ const filterUser = async (req, res, next) => {
             {
                 $or: [{
                     firstName: {
-                        "$regex": filterObj // regex is needed to handle the sub-string match to the db
+                        "$regex": filterObj, // regex is needed to handle the sub-string match to the db
+                        "$options": "i" // case insensitive query
                     }
                 }, {
                     lastName: {
-                        "$regex": filterObj
+                        "$regex": filterObj,
+                        "$options": "i"
                     }
                 }]
             },
