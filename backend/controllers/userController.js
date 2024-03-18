@@ -123,40 +123,81 @@ const updateInfo = async (req, res, next) => {
 
 // filter via firstName/lastName
 const filterUser = async (req, res, next) => {
+    let { page, limit } = req?.query;
+
     const filterObj = req.query.filter || ""; // ?filter=soham
     //get current userId
     const currentUserId = req.userId;
 
     try {
-        //TODO: indexing
-        const users = await User.find(
+
+        const queryObj = {
+            _id: { $ne: currentUserId }, // return other user except current user
+            $or: [{
+                firstName: {
+                    "$regex": filterObj, // regex is needed to handle the sub-string match to the db
+                    "$options": "i" // case insensitive query
+                }
+            }, {
+                lastName: {
+                    "$regex": filterObj,
+                    "$options": "i"
+                }
+            }]
+        }
+
+        const selectObj = { _id: 1, firstName: 1, lastName: 1 } // return users with the field mentioned(id is by default included)
+
+        // Stage 1: Count total documents
+        const countPipeline = [
             {
-                $or: [{
-                    firstName: {
-                        "$regex": filterObj, // regex is needed to handle the sub-string match to the db
-                        "$options": "i" // case insensitive query
-                    }
-                }, {
-                    lastName: {
-                        "$regex": filterObj,
-                        "$options": "i"
-                    }
-                }]
+                $match: queryObj //TODO: the first condition dose not works
             },
+            {
+                $count: "total"
+            }
+        ];
+
+        // Stage 2: Pagination
+        const paginationPipeline = [
+            {
+                $match: queryObj
+            },
+            {
+                $skip: (page && page > 0) ? ((page - 1) * limit) : 0
+            },
+            {
+                $limit: limit ? parseInt(limit) : 0
+            },
+            {
+                $project: selectObj ? selectObj : {}
+            }
+        ];
+
+        // Execute both pipelines in parallel
+        const [totalResults, paginatedResults] = await Promise.all([
+            User.aggregate(countPipeline),
+            User.aggregate(paginationPipeline)
+        ]);
+
+        // Extract total count from the first element of the totalResults array
+        const total = totalResults.length > 0 ? totalResults[0].total : 0;
+
+        // //TODO: indexing
+        let users = User.find(
+            queryObj,
             // select objects
-            { _id: 1, firstName: 1, lastName: 1 } // return users with the field mentioned(id is by default included)
+            selectObj
         )
 
+        users = await users.skip((page && page > 0) ? ((page - 1) * limit) : 0).limit(limit ? limit : 0)
+
         //TODO: what does find returns if there is no user found. Ans: [] (empty array) for 'find' and null for 'findOne'
-        if (users.length === 0) {
+        if (total === 0) {
             return res.status(404).json({ message: "user not found" })
         }
 
-        res.status(200).json(
-            {
-                users: users.filter(usr => usr._id != currentUserId) // return users except the current user
-            }
-        )
+        res.status(200).json({ users: paginatedResults, total: total, nbHits: paginatedResults.length })
 
     } catch (err) {
         console.log(err.message);
